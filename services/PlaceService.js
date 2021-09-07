@@ -3,11 +3,13 @@ const PlaceResponse = require("../models/PlaceResponse");
 const WeatherResponse = require("../models/WeatherResponse");
 const Place = require('../models/PlaceDTO');//en mayuscula como los de arriba para poder crear instancias apartir de el
 const ErrorResponse = require("../models/ErrorResponse");
+const mongoose = require('mongoose');
+const { getRecords } = require("../config/config.db");
 
 class PlaceService {
 
     constructor(){
-        //TODO: leer BD si existe
+        //TODO: leer BD si existe 
     }
 
     //getter
@@ -32,7 +34,7 @@ class PlaceService {
             if(resp.data.features[0] === undefined){
                 const errorResponse = new ErrorResponse({
                     code: 400,
-                    msg: "El lugar no pudo ser ubicado"
+                    msg: 'El lugar no pudo ser ubicado'
                 })
                 return errorResponse
             }
@@ -80,7 +82,6 @@ class PlaceService {
                 max: main.temp_max,
                 temp: main.temp
             });
-
             return weatherResponse;
 
         }catch(error){ 
@@ -98,11 +99,12 @@ class PlaceService {
         //Verificar si el name existe
         const existsName = await Place.findOne({name: placeResponse.placeName});
         if( existsName ){
-            const errorResponse = new ErrorResponse({
-                code: 400,
-                msg: "El lugar ya fue consultado por eso no se vuelve a guardar"
-            })
-            return errorResponse
+            //const errorResponse = new ErrorResponse({
+            //    code: 400,
+            //    msg: "El lugar ya fue consultado por eso no se vuelve a guardar"
+            //})
+            console.log( "El lugar ya fue consultado por eso no se vuelve a guardar");
+            return placeResponse
         }else{
             console.log('Objeto antes de guardar: '+place.name)
 
@@ -110,9 +112,17 @@ class PlaceService {
 
             console.log('Place guardado en la base de datos: '+place);
             return placeResponse
-        }
+        }        
+    }
 
-        
+    async getPlaceRecord(){
+        let namePlaces = [];
+        const collectionPlaces = await Place.find({},'-_id' ,function(err, docs){
+            namePlaces = docs.map(function(element){
+                return element.name;
+            });
+        }).select('name');
+        return namePlaces;
     }
 }
 

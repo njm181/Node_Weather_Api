@@ -12,7 +12,31 @@
         <input type="text" id="place" name="place" size="15" placeholder="Ingrese lugar">
         <button type="submit" id="btnSubmit">Consultar</button>
     </form>
+    <hr>
+    <h5 id="error"></h3>
+
+    <hr>
+    <h2>Clima del lugar indicado</h2>
     
+    <h4>Nombre del lugar</h5>
+    <h5 id="place_name"></h5>
+
+    <h4>Clima</h5>
+    <h5 id="clima"></h5>
+
+    <h4>Temperatura actual</h5>
+    <h5 id="temp_actual"></h5>
+
+    <h4>Minima</h5>
+    <h5 id="min"></h5>
+    
+    <h4>Maxima</h5>
+    <h5 id="max"></h5>
+
+    <hr>
+
+    <h2>Historial de lugares</h2>
+    <p id="item_list"></p>
 
     <script>
         var formulario = document.getElementById('formulario');
@@ -33,7 +57,39 @@
                 body: JSON.stringify({ "placeName": place })
             }).then( res => res.json())
               .then( data => {
-                  console.log('Respuesta: '+JSON.stringify(data))
+                  console.log('Respuesta: '+JSON.stringify(data));
+0
+                  if(data.error != undefined && JSON.stringify( data.error.msg ).length > 0){
+                    document.getElementById('error').innerHTML = JSON.stringify( data.error.msg );
+                    return;
+                  }
+                  if(data.errors[0].msg !== undefined && data.errors[0].msg.length > 0){
+                    document.getElementById('error').innerHTML = data.errors[0].msg;
+                    return;
+                  } 
+
+                  console.log('DESCRIPCION PERRITO MALVADO: '+data.weather_place.description.desc);
+                  document.getElementById('place_name').innerHTML = data.place.placeName;
+                  document.getElementById('clima').innerHTML = data.weather_place.description.desc;
+                  document.getElementById('temp_actual').innerHTML = data.weather_place.description.temp;
+                  document.getElementById('min').innerHTML = data.weather_place.description.min;
+                  document.getElementById('max').innerHTML = data.weather_place.description.max;
+
+                  ul = document.createElement('ul');
+
+                  document.getElementById('item_list').appendChild(ul);
+
+               
+                 Object.keys(data.places_record).forEach(function(key) {
+                 console.log(key, data.places_record[key]);
+                 let li = document.createElement('li');
+                 ul.appendChild(li);
+                 li.innerHTML += JSON.stringify(data.places_record[key]);
+                 });
+                
+
+                
+
               });
             });
     </script>

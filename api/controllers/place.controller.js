@@ -7,6 +7,7 @@ const postPlaceName = async (req, res = response) => {
     const { placeName } = req.body
     const placeService = new PlaceService();
     const placeCoordinatesResponse = await placeService.getCoordinatesByName(placeName);
+    const placesRecord = await placeService.getPlaceRecord();
     if( placeCoordinatesResponse.status !== undefined){
         res.json({
             msj: 'Error Post desde el controller',
@@ -19,7 +20,8 @@ const postPlaceName = async (req, res = response) => {
             msj: 'Post desde el controller',
             place_name: placeName,
             place: placeCoordinatesResponse,
-            weather_place: placeWeatherResponse
+            weather_place: placeWeatherResponse,
+            places_record: placesRecord
         });    
     }
 }
